@@ -24,13 +24,18 @@ La IP de la máquina donde se ha realizado la captura es 192.168.1.34. Se trata 
 
 3. Antes de analizar las tramas, mira las estadísticas generales que aparecen en el menú de Statistics. En el apartado de jerarquía de protocolos (Protocol Hierarchy) se puede ver el porcentaje del tráfico correspondiente al protocolo TCP y UDP.
  ** ¿Cuál de los dos es mayor? ¿Es esto consistente con una aplicación que transmite en tiempo real?
- ** ¿Qué otros protocolos podemos ver en la jerarquía de protocolos?
+El porcentaje de paquetes en UDP es de 92.23% frente a un 2.10% en TCP, con lo que podemos ver claramente que UDP es mayor.
+Esto sí es consistente con una aplicación que transmite en tiempo real ya que por ejemplo si transmitimos en Voz IP no nos interesa que haya una retransmisión de paquetes anteriores.
 
+ ** ¿Qué otros protocolos podemos ver en la jerarquía de protocolos?
+Además de los protocolos nombrados en la pregunta anterior, en Protocol Hierarchy podemos ver RTP, RTCP, HTP, ICMP, ARP, SIP y DNS.
 
 4. Observa por encima el flujo de tramas en el menú de Statistics en IO Graphs. La captura que estamos viendo incluye desde la inicialización (registro) de la aplicación hasta su finalización, con una llamada entremedias.
  ** Filtra por sip para conocer cuándo se envían paquetes SIP. ¿En qué segundos tienen lugar esos envíos?
- ** Y los paquetes con RTP, ¿cuándo se envían?
+Los paquetes SIP se envían en los segundos 7.343770, 14.426793, 16.233522, 39.154151 y 55.694378.
 
+ ** Y los paquetes con RTP, ¿cuándo se envían?
+Los paquetes RTP se envían en los segundos 18.002740, 21.830296, 23.273887, 25.042266, 29.043207, 33.327038 y 35.159692.
 
 
 [Al terminar el ejercicio es recomendable hacer commit de los ficheros modificados]
