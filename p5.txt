@@ -23,6 +23,7 @@ Se ha capturado una sesión SIP (archivo sip.cap.gz), que se puede abrir con Wir
 
 
 3. Antes de analizar las tramas, mira las estadísticas generales que aparecen en el menú de Statistics. En el apartado de jerarquía de protocolos (Protocol Hierarchy) se puede ver el porcentaje del tráfico correspondiente al protocolo TCP y UDP.
+
  ** ¿Cuál de los dos es mayor? ¿Es esto consistente con una aplicación que transmite en tiempo real?
 - El porcentaje de paquetes en UDP es de 92.23% frente a un 2.10% en TCP, con lo que podemos ver claramente que UDP es mayor.
 Esto sí es consistente con una aplicación que transmite en tiempo real ya que por ejemplo si transmitimos en Voz IP no nos interesa que haya una retransmisión de paquetes anteriores.
@@ -110,23 +111,30 @@ Esto sí es consistente con una aplicación que transmite en tiempo real ya que 
 10. Una vez registrados, podemos efectuar una llamada. Vamos a probar con el servicio de eco de Ekiga que nos permite comprobar si nos hemos conectado correctamente. El servicio de eco tiene la dirección sip:500@ekiga.net. Veamos el INVITE de cerca.
  ** ¿Puede verse el nombre del que efectúa la llamada, así como su dirección SIP?
 - Sí, estos datos están contenidos en el campo "Message Header", exactamente en "from".
+
  ** ¿Qué es lo que contiene el cuerpo de la trama? ¿En qué formato/protocolo está?
 - Contiene la información que sirve para describir la sesión de comunicación multimedia establecida. El protocolo utilizado es SDP.
+
  ** ¿Tiene éxito el primer intento? ¿Cómo lo sabes?
 - No, porque el usuario al que efectuamos la llamada nos responde con un error "407: Proxy Authentication Required" en vez de responder con un "200 OK"
- ** ¿En qué se diferencia el segundo INVITE más abajo del primero? ¿A qué crees que se debe esto?
+ 
+** ¿En qué se diferencia el segundo INVITE más abajo del primero? ¿A qué crees que se debe esto?
 - Se diferencia en que el segundo intento contiene el campo "Proxy-Authentication". Se debe a que el INVITE necesita esa información para poder realizarse correctamente, por eso en el primer intento el error es consecuencia de que no tenemos dicho campo. Se diferencia también en que el segundo INVITE contiene más bits en la trama que el primer INVITE ya que además de los datos que contenía este último se le ha añadido el campo "Proxy-Authentication".
 
 
 11. Una vez conectado, estudia el intercambio de tramas.
  ** ¿Qué protocolo(s) se utiliza(n)? ¿Para qué sirven estos protocolos?
 - Se utiliza RTP para enviar audio y vídeo, en caso del segundo, se utiliza también el codec H.261 que forma parte de los estándares de codificación de vídeo del ITU-T Video Coding Experts Group (VCEG).
- ** ¿Cuál es el tamaño de paquete de los mismos?
+ 
+** ¿Cuál es el tamaño de paquete de los mismos?
 - En el caso de RTP para audio el tamaño es 214 bytes (1712 bits) y en caso de vídeo el tamaño de paquete es variable.
+
  ** ¿Se utilizan bits de padding?
 - No se utilizan: " ..0. .... = Padding: False".
- ** ¿Cuál es la periodicidad de los paquetes que se envían?
+ 
+** ¿Cuál es la periodicidad de los paquetes que se envían?
 - 160 ms.
+
  ** ¿Cuántos bits/segundo estamos enviando?
 - 10700 bits/segundo.
 
@@ -137,49 +145,62 @@ Esto sí es consistente con una aplicación que transmite en tiempo real ya que 
 12. Vamos a ver más a fondo el intercambio RTP. En Telephony hay una opción RTP. Empecemos mirando los flujos RTP.
  ** ¿Cuántos flujos hay? ¿por qué?
 - Dos flujos, porque están dirigidos a dos puertos diferentes (5014 y 5010) uno para audio y otro para vídeo. 
+
  ** ¿Cuántos paquetes se pierden?
 - No se pierde ningún paquete.
- ** ¿Cuál es el valor máximo del delta? ¿Y qué es lo que significa el valor de delta?
+ 
+** ¿Cuál es el valor máximo del delta? ¿Y qué es lo que significa el valor de delta?
 - Es el máximo retardo de los paquetes. El valor máximo del delta de los paquetes que van dirigidos al puerto 5010 es de 1290.48, de los que van dirigidos al puerto 5014 es 1290.40
+
  ** ¿Cuáles son los valores de jitter (medio y máximo)? ¿Qué quiere decir eso? ¿Estamos ante una conversación de calidad?
-- El valor máximo de jitter de los paquetes que van dirigidos al puerto 5010 es 183.10, de los paquetes dirigidos al puerto 5014 es 119.64. El valor mínimo de jitter de los paquetes que van dirigidos al puerto 5010 es 153.24, de los paquetes dirigidos al puerto 5014 es 42.50
+- El valor máximo de jitter de los paquetes con puerto origen 5014 es 183.10, de los paquetes con puerto origen 5010 es 119.64. El valor mínimo de jitter de los paquetes con puerto origen 5014 es 153.24, de los paquetes con puerto origen 5010 es 42.50
 -  No, ya que el jitter tiene mucha variación y esto hace que haya mucha diferencia de retardo y tengamos una conversación de baja calidad.
 
 13. Elige un paquete RTP de audio. Analiza el flujo de audio en Telephony -> RTP -> Stream Analysis.
  ** ¿Cuánto valen el delta y el jitter para el primer paquete que ha llegado?
 - delta: 0 jitter: 0
+
  ** ¿Podemos saber si éste es el primer paquete que nos han enviado?
 - No, sabemos que es el primer paquete que nos llega porque tiene delta y jitter 0 pero no tenemos forma de saber si nos han enviado otro paquete antes y este se ha perdido.
- ** Los valores de jitter son menores de 10ms hasta un paquete dado. ¿Cuál?
+ 
+** Los valores de jitter son menores de 10ms hasta un paquete dado. ¿Cuál?
 - A partir del paquete 247 incluido hay paquetes con jitter mayor de 10 ms.
+
  ** ¿A qué se debe el cambio tan brusco del jitter?
 - A que el delta se incrementa de manera considerable en ese paquete.
- ** ¿Es comparable este cambio con el tiempo desde la recepción del paquete anterior? ¿Por qué?
-- 
- ** ¿Cuál es la dependencia entre el tiempo transcurrido desde el paquete anterior y el valor de jitter?
+ 
+** ¿Es comparable este cambio con el tiempo desde la recepción del paquete anterior? ¿Por qué?
+- Sí es comparable ya que el jitter y el delta están relacionados y el delta es el retardo de los paquetes.
+ 
+** ¿Cuál es la dependencia entre el tiempo transcurrido desde el paquete anterior y el valor de jitter?
 - No se puede saber que dependencia hay.
 
 14. En Telephony selecciona el menú VoIP calls. Verás que se lista la llamada de voz IP capturada en una ventana emergente. Selecciona esa llamada y pulsa el botón Graph.
  ** ¿Cuánto dura la conversación?
 - 20.889 segundos.
- ** ¿Cuáles son sus SSRC? ¿Por qué hay varios SSRCs? ¿Hay CSRCs?
+ 
+** ¿Cuáles son sus SSRC? ¿Por qué hay varios SSRCs? ¿Hay CSRCs?
 -  h.261: 43306582 g711a: BF4AFD37, hay varios porque trata con audio y vídeo. No hay CSRCs.
 
 
 15. Identifica la trama donde se finaliza la conversación.
  ** ¿Qué método SIP se utiliza?
 - Utiliza el método BYE.
- ** ¿En qué trama(s)?
+ 
+** ¿En qué trama(s)?
 - En las tramas 924, 925, 927 y 933.
- ** ¿Por qué crees que se envía varias veces?
+ 
+** ¿Por qué crees que se envía varias veces?
 - Porque no ha recibido el "200 OK".
 
 
 16. Finalmente, se cierra la aplicación de VozIP.
  ** ¿Por qué aparece una instrucción SIP del tipo REGISTER?
 - Para poder poner el tiempo de expiración a 0 antes de cerrarse.
- ** ¿En qué trama sucede esto?
+ 
+** ¿En qué trama sucede esto?
 - En la trama 950.
+
  ** ¿En qué se diferencia con la instrucción que se utilizó con anterioridad (al principio de la sesión)?
 - El REGISTER del principio de la sesión tenía un campo Expires de 3600 segundos, en este caso, tiene un Expires de 0 segundos.
 
@@ -197,21 +218,26 @@ Captura una sesión SIP de una conversación con el número SIP sip:9999@qxip.ne
 17. Observa las diferencias en el inicio de la conversación entre el entorno del laboratorio y el del ejercicio anterior:
  ** ¿Es necesario el uso de DNS y STUN? ¿Por qué?
 - No necesitamos esos protocolos ya que detrás no hay ningún router NAT.
- ** ¿Son diferentes el registro y la descripción de la sesión?
+ 
+** ¿Son diferentes el registro y la descripción de la sesión?
 - No, son iguales.
 
 
 18. Identifica las diferencias existentes entre esta conversación y la conversación anterior:
  ** ¿Cuántos flujos tenemos?
 - Dos flujos, uno dirigido al puerto 5070 y otro dirigido al puerto 33410.
+
  ** ¿Cuál es su periodicidad?
 - 160 ms.
- ** ¿Cuánto es el valor máximo del delta y los valores medios y máximo del jitter?
+ 
+** ¿Cuánto es el valor máximo del delta y los valores medios y máximo del jitter?
 - Del flujo dirigido al puerto 5070 el valor máximo del delta es 35.61, el valor medio del jitter es 5.04 y el valor máximo del jitter es 6.76.
 - Del flujo dirigido al puerto 33410 el valor máximo del delta es 30.53, el valor medio del jitter es 4.98 y el valor máximo del jitter es 6.68.
- ** ¿Podrías reproducir la conversación desde Wireshark? ¿Cómo? Comprueba que poniendo un valor demasiado pequeño para el buffer de jitter, la conversación puede no tener la calidad necesaria.
+ 
+** ¿Podrías reproducir la conversación desde Wireshark? ¿Cómo? Comprueba que poniendo un valor demasiado pequeño para el buffer de jitter, la conversación puede no tener la calidad necesaria.
 - Sí se podría reproducir la conversación, con VoIP y después pulsando player.
- ** ¿Sabrías decir qué tipo de servicio ofrece sip:9999@qxip.net?
+ 
+** ¿Sabrías decir qué tipo de servicio ofrece sip:9999@qxip.net?
 - Música
 
 
