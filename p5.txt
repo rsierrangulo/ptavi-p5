@@ -140,9 +140,9 @@ Esto sí es consistente con una aplicación que transmite en tiempo real ya que 
  ** ¿Cuántos paquetes se pierden?
 - No se pierde ningún paquete.
  ** ¿Cuál es el valor máximo del delta? ¿Y qué es lo que significa el valor de delta?
-- Es el máximo retardo de los paquetes. El valor máximo del delta de los paquetes que van dirigidos al puerto 5014 es de 1290.48, de los que van dirigidos al puerto 5010 es 1290.40
+- Es el máximo retardo de los paquetes. El valor máximo del delta de los paquetes que van dirigidos al puerto 5010 es de 1290.48, de los que van dirigidos al puerto 5014 es 1290.40
  ** ¿Cuáles son los valores de jitter (medio y máximo)? ¿Qué quiere decir eso? ¿Estamos ante una conversación de calidad?
-- El valor máximo de jitter de los paquetes que van dirigidos al puerto 5014 es 183.10, de los paquetes dirigidos al puerto 5010 es 119.64. El valor mínimo de jitter de los paquetes que van dirigidos al puerto 5014 es 153.24, de los paquetes dirigidos al puerto 5010 es 42.50
+- El valor máximo de jitter de los paquetes que van dirigidos al puerto 5010 es 183.10, de los paquetes dirigidos al puerto 5014 es 119.64. El valor mínimo de jitter de los paquetes que van dirigidos al puerto 5010 es 153.24, de los paquetes dirigidos al puerto 5014 es 42.50
 -  No, ya que el jitter tiene mucha variación y esto hace que haya mucha diferencia de retardo y tengamos una conversación de baja calidad.
 
 13. Elige un paquete RTP de audio. Analiza el flujo de audio en Telephony -> RTP -> Stream Analysis.
@@ -157,13 +157,13 @@ Esto sí es consistente con una aplicación que transmite en tiempo real ya que 
  ** ¿Es comparable este cambio con el tiempo desde la recepción del paquete anterior? ¿Por qué?
 - 
  ** ¿Cuál es la dependencia entre el tiempo transcurrido desde el paquete anterior y el valor de jitter?
-- 
+- No se puede saber que dependencia hay.
 
 14. En Telephony selecciona el menú VoIP calls. Verás que se lista la llamada de voz IP capturada en una ventana emergente. Selecciona esa llamada y pulsa el botón Graph.
  ** ¿Cuánto dura la conversación?
 - 20.889 segundos.
  ** ¿Cuáles son sus SSRC? ¿Por qué hay varios SSRCs? ¿Hay CSRCs?
--  
+-  h.261: 43306582 g711a: BF4AFD37, hay varios porque trata con audio y vídeo. No hay CSRCs.
 
 
 15. Identifica la trama donde se finaliza la conversación.
@@ -196,16 +196,23 @@ Captura una sesión SIP de una conversación con el número SIP sip:9999@qxip.ne
 
 17. Observa las diferencias en el inicio de la conversación entre el entorno del laboratorio y el del ejercicio anterior:
  ** ¿Es necesario el uso de DNS y STUN? ¿Por qué?
+- No necesitamos esos protocolos ya que detrás no hay ningún router NAT.
  ** ¿Son diferentes el registro y la descripción de la sesión?
+- No, son iguales.
 
 
 18. Identifica las diferencias existentes entre esta conversación y la conversación anterior:
  ** ¿Cuántos flujos tenemos?
+- Dos flujos, uno dirigido al puerto 5070 y otro dirigido al puerto 33410.
  ** ¿Cuál es su periodicidad?
+- 160 ms.
  ** ¿Cuánto es el valor máximo del delta y los valores medios y máximo del jitter?
+- Del flujo dirigido al puerto 5070 el valor máximo del delta es 35.61, el valor medio del jitter es 5.04 y el valor máximo del jitter es 6.76.
+- Del flujo dirigido al puerto 33410 el valor máximo del delta es 30.53, el valor medio del jitter es 4.98 y el valor máximo del jitter es 6.68.
  ** ¿Podrías reproducir la conversación desde Wireshark? ¿Cómo? Comprueba que poniendo un valor demasiado pequeño para el buffer de jitter, la conversación puede no tener la calidad necesaria.
+- Sí se podría reproducir la conversación, con VoIP y después pulsando player.
  ** ¿Sabrías decir qué tipo de servicio ofrece sip:9999@qxip.net?
-
+- Música
 
 
 [Al terminar el ejercicio es recomendable hacer commit de los ficheros modificados]
