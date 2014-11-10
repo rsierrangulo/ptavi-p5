@@ -91,29 +91,44 @@ Esto sí es consistente con una aplicación que transmite en tiempo real ya que 
 - El user agent entiende las siguientes instrucciones además de REGISTER: INVITE, ACK, OPTIONS, BYE, CANCEL, NOTIFY, REFER y MESSAGE.
 
 
-
 [Al terminar el ejercicio es recomendable hacer commit de los ficheros modificados]
 
 9. Fijémonos en las tramas siguientes a la número 46:
  ** ¿Se registra con éxito en el primer intento?
+- No se registra con éxito.
+
  ** ¿Cómo sabemos si el registro se ha realizado correctamente o no?
+- Sabemos si el registro se realiza correctamente mirando el estado del mensaje de respuesta que se recibe. En el caso del primer intento nos encontramos con "Status: 401 Unauthorized (0 bindings)" por lo que no se ha registrado con éxito, sin embargo, en el segundo intento nos encontramos con "Status: 200 OK (1 bindings)" lo que nos indica que esta vez sí se ha registrado correctamente.
+
  ** ¿Podrías identificar las diferencias entre el primer intento y el segundo de registro? (fíjate en el tamaño de los paquetes y mira a qué se debe el cambio)
+- En el primer intento el tamaño del paquete es de 523 bytes y en el segundo intento 714 bytes. Esto se debe a que el paquete del primer intento no contiene la cabecera "Authorization".
+
  ** ¿Cuánto es el valor del tiempo de expiración de la sesión? Indica las unidades.
+- Si miramos la cabecera Expires comprobamos que el tiempo de expiración es de 3600 segundos.
 
 
 10. Una vez registrados, podemos efectuar una llamada. Vamos a probar con el servicio de eco de Ekiga que nos permite comprobar si nos hemos conectado correctamente. El servicio de eco tiene la dirección sip:500@ekiga.net. Veamos el INVITE de cerca.
  ** ¿Puede verse el nombre del que efectúa la llamada, así como su dirección SIP?
+- Sí, estos datos están contenidos en el campo "Message Header", exactamente en "from".
  ** ¿Qué es lo que contiene el cuerpo de la trama? ¿En qué formato/protocolo está?
+- Contiene la información que sirve para describir la sesión de comunicación multimedia establecida. El protocolo utilizado es SDP.
  ** ¿Tiene éxito el primer intento? ¿Cómo lo sabes?
+- No, porque el usuario al que efectuamos la llamada nos responde con un error "407: Proxy Authentication Required" en vez de responder con un "200 OK"
  ** ¿En qué se diferencia el segundo INVITE más abajo del primero? ¿A qué crees que se debe esto?
+- Se diferencia en que el segundo intento contiene el campo "Proxy-Authentication". Se debe a que el INVITE necesita esa información para poder realizarse correctamente, por eso en el primer intento el error es consecuencia de que no tenemos dicho campo. Se diferencia también en que el segundo INVITE contiene más bits en la trama que el primer INVITE ya que además de los datos que contenía este último se le ha añadido el campo "Proxy-Authentication".
 
 
 11. Una vez conectado, estudia el intercambio de tramas.
  ** ¿Qué protocolo(s) se utiliza(n)? ¿Para qué sirven estos protocolos?
+- Se utiliza RTP para enviar audio y vídeo, en caso del segundo, se utiliza también el codec H.261 que forma parte de los estándares de codificación de vídeo del ITU-T Video Coding Experts Group (VCEG).
  ** ¿Cuál es el tamaño de paquete de los mismos?
+- En el caso de RTP para audio el tamaño es 214 bytes (1712 bits) y en caso de vídeo el tamaño de paquete es variable.
  ** ¿Se utilizan bits de padding?
+- No se utilizan: " ..0. .... = Padding: False"
  ** ¿Cuál es la periodicidad de los paquetes que se envían?
+- 160
  ** ¿Cuántos bits/segundo estamos enviando?
+- 10700 bits/segundos
 
 
 
